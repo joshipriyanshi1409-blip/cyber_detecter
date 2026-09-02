@@ -1,0 +1,38 @@
+{
+  "source_archive": "cyber_detecter_repaired_complete.zip",
+  "baseline_tests": {
+    "collected": 216,
+    "collection_errors": 4,
+    "skipped": 1,
+    "error": "Scapy unavailable"
+  },
+  "final_full_collection": {
+    "collected": 222,
+    "collection_errors": 4,
+    "skipped": 1,
+    "blocked_by": "Scapy unavailable"
+  },
+  "final_provision_independent": {
+    "passed": 204,
+    "skipped": 1,
+    "failed": 0
+  },
+  "new_six_threat_tests": 6,
+  "throughput_benchmark": {
+    "flows": 5000,
+    "flows_per_second": 10187.744440919665,
+    "max_window_processing_latency_ms": 124.54640400028438
+  },
+  "threat_pcaps": {
+    "ddos.pcap": "DDOS",
+    "c2_beacon.pcap": "C2_BEACONING",
+    "dga.pcap": "DGA",
+    "dns_tunnel.pcap": "DNS_TUNNELLING",
+    "tls_quic_anomaly.pcap": "ENCRYPTED_SESSION_MALWARE",
+    "port_scan.pcap": "PORT_SCAN",
+    "exfiltration.pcap": "POTENTIAL_DATA_EXFILTRATION",
+    "benign.pcap": "NO_ALERTS"
+  },
+  "live_real_capture": "NOT_VALIDATED: Scapy/libpcap unavailable",
+  "docker": "NOT_VALIDATED: docker executable unavailable"
+}

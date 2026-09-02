@@ -1,0 +1,77 @@
+port_scan:
+  min_unique_ports: 10
+  min_unique_hosts: 5
+  min_failed_ratio: 0.5
+  min_syn_ratio: 0.7
+  window_seconds: 60
+  min_flows: 5
+
+ddos:
+  min_pps: 1000
+  min_bps: 100000
+  min_syn_ratio: 0.7
+  source_concentration: 0.5
+  window_seconds: 10
+  min_flows: 10
+
+syn_flood:
+  min_flows: 5
+  min_syn_only_pps: 100.0
+  max_ack_completion_ratio: 0.3
+  destination_concentration_threshold: 0.5
+  min_spoofing_likelihood: 0.4
+
+udp_flood:
+  min_flows: 5
+  min_udp_pps: 500.0
+  dest_port_concentration_threshold: 0.5
+  destination_concentration_threshold: 0.5
+  min_one_packet_source_ratio: 0.5
+  reflection_min_amplification_ratio: 5.0
+  reflection_min_flows: 5
+  reflection_min_reply_bytes: 5000
+
+dga:
+  min_length: 8
+  max_length: 64
+  min_entropy: 3.5
+  digit_ratio_threshold: 0.3
+  ngram_score: 0.1
+  nxdomain_rate_threshold: 0.3
+  min_queries: 3
+
+risk_scoring:
+  severity_mapping:
+    low: [0, 30]
+    medium: [31, 60]
+    high: [61, 80]
+    critical: [81, 100]
+  weights:
+    rule_based: 0.6
+    anomaly_score: 0.2
+    ml_confidence: 0.2
+
+cti:
+  # Section 27: rate-limit CTI lookups so attacker-controlled traffic
+  # (e.g. many distinct spoofed source IPs) can't force unlimited
+  # external calls. Cache hits do not count against this budget.
+  max_lookups_per_window: 60
+  rate_limit_window_seconds: 60.0
+
+# Six-threat category thresholds
+c2:
+  min_repeats: 4
+  max_cv: 0.20
+  max_interval_seconds: 300
+dns_threat:
+  min_dga_score: 0.65
+  min_tunnel_score: 0.70
+encrypted_session:
+  min_outbound_bytes: 50000
+  min_duration_seconds: 10
+  min_score: 0.70
+exfiltration:
+  min_outbound_bytes: 1000000
+  min_outbound_inbound_ratio: 5.0
+  min_duration_seconds: 30
+  min_score: 0.70

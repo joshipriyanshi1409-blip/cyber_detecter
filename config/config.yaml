@@ -1,0 +1,63 @@
+app:
+  name: Cyber Threat Detection Platform
+  version: 0.1.0
+  environment: development
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: logs/app.log
+
+database:
+  path: data/threats.db
+  echo: false
+
+paths:
+  data_dir: data
+  raw_pcaps: data/raw
+  processed_data: data/processed
+  models_dir: models
+  database_path: data/threats.db
+
+detection:
+  enabled_detectors:
+    - ddos
+    - c2
+    - dns_threat
+    - encrypted_session
+    - port_scan
+    - exfiltration
+    # Legacy sub-detectors remain available for backward compatibility.
+    - syn_flood
+    - udp_flood
+
+ml:
+  isolation_forest:
+    contamination: 0.1
+    random_state: 42
+    n_estimators: 100
+  random_forest:
+    enabled: true
+    n_estimators: 100
+    random_state: 42
+    test_size: 0.2
+    class_weight: balanced
+  model_integrity:
+    require_hash: true
+
+streaming:
+  batch_size: 100
+  target:
+    flows_per_second: 1000
+    max_alert_latency_seconds: 10
+  window_seconds: 60
+  windowing:
+    enabled: true
+    window_seconds: 10
+    slide_seconds: 1
+    max_buffered_flows: 100000
+  resources:
+    max_pcap_upload_mb: 200
+    max_retained_packets: 10000
+    max_alerts_per_window: 1000
+    max_cti_lookups_per_window: 60

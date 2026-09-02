@@ -1,0 +1,75 @@
+# docker-compose.yml for cyber_detecter
+#
+# NOT build-tested in this sandbox (no network access -- see
+# docs/AUDIT_PROGRESS.md / docs/NEXT_AGENT_PROMPT.md). Review before
+# relying on it in any real environment.
+#
+# Services:
+#   dashboard      -- Streamlit UI (default `docker compose up`)
+#   pipeline       -- one-shot batch run of the detection pipeline over a
+#                      pcap file, writes results.json and exits
+#   live-capture   -- OPT-IN ONLY, commented out below. Passive live
+#                      packet capture needs host network access and
+#                      CAP_NET_RAW/CAP_NET_ADMIN, which this project
+#                      does not grant by default. See docs/THREAT-MODELS.md
+#                      for why this stays passive-only and explicit.
+
+version: "3.9"
+
+services:
+  dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: cyber_detecter:latest
+    command: ["python3", "-m", "streamlit", "run", "dashboard/app.py",
+              "--server.port", "8501", "--server.address", "127.0.0.1",
+              "--browser.gatherUsageStats", "false"]
+    ports:
+      - "127.0.0.1:8501:8501"
+    volumes:
+      - ../data:/app/data
+      - ../logs:/app/logs
+      - ../demo:/app/demo:ro
+    environment:
+      - THREATFOX_API_KEY=${THREATFOX_API_KEY:-}
+      - URLHAUS_API_KEY=${URLHAUS_API_KEY:-}
+      - MALWAREBAZAAR_API_KEY=${MALWAREBAZAAR_API_KEY:-}
+      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD:?DASHBOARD_PASSWORD must be set}
+    restart: unless-stopped
+
+  pipeline:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: cyber_detecter:latest
+    command: ["python3", "scripts/run_pipeline.py", "/app/demo/port_scan.pcap",
+              "--output", "/app/data/results.json"]
+    volumes:
+      - ../data:/app/data
+      - ../logs:/app/logs
+      - ../demo:/app/demo:ro
+    environment:
+      - THREATFOX_API_KEY=${THREATFOX_API_KEY:-}
+      - URLHAUS_API_KEY=${URLHAUS_API_KEY:-}
+      - MALWAREBAZAAR_API_KEY=${MALWAREBAZAAR_API_KEY:-}
+
+  # live-capture:
+  #   Uncomment ONLY for a deliberate, reviewed, controlled-lab capture
+  #   session (see the warning in src/ingest/live_capture.py). This
+  #   requires elevated container privileges that the rest of this
+  #   compose file intentionally avoids.
+  #
+  #   build:
+  #     context: ..
+  #     dockerfile: docker/Dockerfile
+  #   image: cyber_detecter:latest
+  #   network_mode: host
+  #   cap_add:
+  #     - NET_ADMIN
+  #     - NET_RAW
+  #   command: ["python3", "-c",
+  #             "from src.ingest.live_capture import LivePacketCapture; \
+  #              LivePacketCapture(interface='eth0').start()"]
+  #   volumes:
+  #     - ../data:/app/data
